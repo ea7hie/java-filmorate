@@ -1,12 +1,38 @@
 package ru.yandex.practicum.filmorate.model;
 
-import lombok.Getter;
-import lombok.Setter;
+import jakarta.validation.constraints.*;
+import lombok.*;
+import ru.yandex.practicum.filmorate.annotations.CheckDate;
+
+import java.time.LocalDate;
+
 
 /**
  * Film.
  */
-@Getter
-@Setter
+@Data
+@NoArgsConstructor
+@RequiredArgsConstructor
+@AllArgsConstructor
 public class Film {
+
+    private Long id;
+
+    @NonNull
+    @NotNull
+    @NotEmpty
+    @NotBlank
+    private String name;
+
+    @NonNull
+    @Size(max = 200)
+    private String description;
+
+    @NonNull
+    @CheckDate
+    private LocalDate releaseDate;
+
+    @Positive
+    @NonNull
+    private Integer duration;
 }
