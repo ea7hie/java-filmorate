@@ -366,7 +366,7 @@ class UserControllerTest {
     void shouldUpdateUserWithoutName() throws Exception {
         int sizeBeforeTest = userController.getAllUsers().size();
 
-        User newUser = new User(1L, "ea7hie@gmail.com", "login",
+        User newUser = new User(1L, "ea7hie56@gmail.com", "login",
                 LocalDate.of(2005, Month.JANUARY, 7));
 
         mockMvc.perform(

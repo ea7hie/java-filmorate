@@ -25,6 +25,9 @@ public class UserController {
     @PostMapping
     public User addNewUser(@Valid @RequestBody User newUser) {
         newUser.setId(getNextIdForUser());
+        if (newUser.getName() == null || newUser.getName().isBlank() || newUser.getName().isEmpty()) {
+            newUser.setName(newUser.getLogin());
+        }
         allUsersByIds.put(newUser.getId(), newUser);
         return newUser;
     }
@@ -43,6 +46,10 @@ public class UserController {
                 throw new ValidationException("Этот имейл уже используется");
             }
             oldUser.setEmail(newUser.getEmail());
+        }
+
+        if (newUser.getName() == null || newUser.getName().isBlank() || newUser.getName().isEmpty()) {
+            newUser.setName(newUser.getLogin());
         }
 
         allUsersByIds.put(newUser.getId(), newUser);
