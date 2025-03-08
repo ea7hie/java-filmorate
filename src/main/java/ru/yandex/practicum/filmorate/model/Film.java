@@ -19,8 +19,6 @@ public class Film {
     private Long id;
 
     @NonNull
-    @NotNull
-    @NotEmpty
     @NotBlank
     private String name;
 

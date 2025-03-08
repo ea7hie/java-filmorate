@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -208,13 +209,18 @@ class UserControllerTest {
 
     //I.3.C ввод некорректного логина: null
     @Test
-    void shouldNotAddNewUserWithLoginIsNull() {
+    void shouldNotAddNewUserWithLoginIsNull() throws Exception{
         int sizeBeforeTest = userController.getAllUsers().size();
 
-        assertThrows(NullPointerException.class, () -> {
-            User newUser = new User("name", "ea7hie@gmail.com", null,
-                    LocalDate.of(2005, Month.JANUARY, 7));
-        });
+        User newUser = new User("name", "ea7hie@gmail.com", null,
+                LocalDate.of(2005, Month.JANUARY, 7));
+
+        mockMvc.perform(
+                post("/users")
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(newUser))
+        ).andExpect(status().isBadRequest());
+
         assertEquals(sizeBeforeTest, userController.getAllUsers().size());
     }
 
@@ -254,13 +260,20 @@ class UserControllerTest {
 
     //I.4.C ввод некорректного имайла: null
     @Test
-    void shouldNotAddNewUserWithEmailIsNull() {
+    void shouldNotAddNewUserWithEmailIsNull() throws Exception {
         int sizeBeforeTest = userController.getAllUsers().size();
+        User newUser = new User("name", null, "login",
+                LocalDate.of(2005, Month.JANUARY, 7));
+       /* assertThrows(NullPointerException.class, () -> {
 
-        assertThrows(NullPointerException.class, () -> {
-            User newUser = new User("name", null, "login",
-                    LocalDate.of(2005, Month.JANUARY, 7));
-        });
+        });*/
+
+        mockMvc.perform(
+                post("/users")
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(newUser))
+        ).andExpect(status().isBadRequest());
+
         assertEquals(sizeBeforeTest, userController.getAllUsers().size());
     }
 
@@ -318,13 +331,17 @@ class UserControllerTest {
 
     //I.5.C ввод некорректной даты рождения: null
     @Test
-    void shouldNotAddNewUserWithBirthdayIsNull() {
+    void shouldNotAddNewUserWithBirthdayIsNull() throws Exception{
         int sizeBeforeTest = userController.getAllUsers().size();
 
-        assertThrows(NullPointerException.class, () -> {
-            User newUser = new User("name", "ea7hie@mail.ru", "login",
-                    null);
-        });
+        User newUser = new User("name", "ea7hie@mail.ru", "login",
+                null);
+        mockMvc.perform(
+                post("/users")
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(newUser))
+        ).andExpect(status().isBadRequest());
+
         assertEquals(sizeBeforeTest, userController.getAllUsers().size());
     }
 

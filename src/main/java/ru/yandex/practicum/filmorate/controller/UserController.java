@@ -25,8 +25,13 @@ public class UserController {
     @PostMapping
     public User addNewUser(@Valid @RequestBody User newUser) {
         newUser.setId(getNextIdForUser());
-        if (newUser.getName() == null || newUser.getName().isBlank() || newUser.getName().isEmpty()) {
+        if (isNameEmpty(newUser.getName())) {
+            log.info("new user without name; name is login");
             newUser.setName(newUser.getLogin());
+        }
+        if (hasLoginSpaces(newUser.getLogin())) {
+            log.error("login has spaces");
+            throw new ValidationException("Логин не может содержать пробелы");
         }
         allUsersByIds.put(newUser.getId(), newUser);
         return newUser;
@@ -39,6 +44,11 @@ public class UserController {
             throw new ValidationException("Не найдено пользователя с таким id: " + newUser.getId());
         }
 
+        if (hasLoginSpaces(newUser.getLogin())) {
+            log.error("new login has spaces");
+            throw new ValidationException("Логин не может содержать пробелы");
+        }
+
         User oldUser = allUsersByIds.get(newUser.getId());
         if (!oldUser.getEmail().equals(newUser.getEmail())) {
             if (isEmailAlreadyUsed(newUser.getEmail())) {
@@ -48,14 +58,14 @@ public class UserController {
             oldUser.setEmail(newUser.getEmail());
         }
 
-        if (newUser.getName() == null || newUser.getName().isBlank() || newUser.getName().isEmpty()) {
+        if (isNameEmpty(newUser.getName())) {
+            log.info("new user without name; new name is login");
             newUser.setName(newUser.getLogin());
         }
 
         allUsersByIds.put(newUser.getId(), newUser);
         log.info("old user updated");
         return newUser;
-
     }
 
     private long getNextIdForUser() {
@@ -67,5 +77,13 @@ public class UserController {
                 .map(User::getEmail)
                 .toList()
                 .contains(emailForCheck);
+    }
+
+    private boolean isNameEmpty(String nameForCheck) {
+        return nameForCheck == null || nameForCheck.isBlank() || nameForCheck.isEmpty();
+    }
+
+    private boolean hasLoginSpaces(String loginForCheck) {
+        return loginForCheck.contains(" ");
     }
 }
