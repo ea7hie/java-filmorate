@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +13,6 @@ import java.time.Month;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -209,7 +207,7 @@ class UserControllerTest {
 
     //I.3.C ввод некорректного логина: null
     @Test
-    void shouldNotAddNewUserWithLoginIsNull() throws Exception{
+    void shouldNotAddNewUserWithLoginIsNull() throws Exception {
         int sizeBeforeTest = userController.getAllUsers().size();
 
         User newUser = new User("name", "ea7hie@gmail.com", null,
@@ -331,7 +329,7 @@ class UserControllerTest {
 
     //I.5.C ввод некорректной даты рождения: null
     @Test
-    void shouldNotAddNewUserWithBirthdayIsNull() throws Exception{
+    void shouldNotAddNewUserWithBirthdayIsNull() throws Exception {
         int sizeBeforeTest = userController.getAllUsers().size();
 
         User newUser = new User("name", "ea7hie@mail.ru", "login",
