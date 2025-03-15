@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.storage.user;
 
 import jakarta.validation.ValidationException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
@@ -10,6 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Component
+@Slf4j
 public class InMemoryUserStorage implements UserStorage {
     private Map<Long, User> allUsersByIds = new HashMap<>();
     private long idForNewUser = 0;
@@ -30,7 +32,7 @@ public class InMemoryUserStorage implements UserStorage {
     @Override
     public User addUser(User newUserForAdd) {
         if (isEmailAlreadyUsed(newUserForAdd.getEmail())) {
-            log.info("new email already used");
+            log.error("new email already used");
             throw new ValidationException("Этот имейл уже используется");
         }
         if (hasLoginSpaces(newUserForAdd.getLogin())) {
@@ -38,7 +40,7 @@ public class InMemoryUserStorage implements UserStorage {
             throw new ValidationException("Логин не должен содержать пробелы");
         }
         if (isNameEmpty(newUserForAdd.getName())) {
-            log.info("new user without name; name is login");
+            log.error("new user without name; name is login");
             newUserForAdd.setName(newUserForAdd.getLogin());
         }
         newUserForAdd.setId(getNextIdForUser());

@@ -14,4 +14,6 @@ public interface FilmStorage {
     public Film updateFilm(Film newFilmForUpdate);
 
     public Film deleteFilm(long idFilmForDelete);
+
+    public Collection<Film> getMostLikedFilms(int count);
 }

@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.service;
 
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
@@ -12,6 +13,7 @@ import java.util.Set;
 @Service
 @RequiredArgsConstructor
 public class FilmService {
+    @Getter
     private final FilmStorage filmStorage;
     private final UserStorage userStorage;
 
