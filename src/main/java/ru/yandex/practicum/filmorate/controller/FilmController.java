@@ -44,8 +44,4 @@ public class FilmController {
     private long getNextIdForFilm() {
         return ++idForNewFilm;
     }
-
-    private boolean isNull(Object o) {
-        return o == null;
-    }
 }

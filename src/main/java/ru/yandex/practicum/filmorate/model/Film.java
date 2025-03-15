@@ -7,6 +7,8 @@ import lombok.*;
 import ru.yandex.practicum.filmorate.annotations.CheckDate;
 
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 
 /**
@@ -19,6 +21,7 @@ import java.time.LocalDate;
 public class Film {
 
     private Long id;
+    private Set<Long> idsOfAllUsersWhoLike = new HashSet<>();
 
     @NonNull
     @NotBlank
