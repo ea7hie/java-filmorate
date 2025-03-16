@@ -71,8 +71,12 @@ public class InMemoryUserStorage implements UserStorage {
         if (isNameEmpty(newUserForUpdate.getName())) {
             log.info("new user without name; new name is login");
             oldUser.setName(newUserForUpdate.getLogin());
+        } else {
+            oldUser.setName(newUserForUpdate.getName());
         }
 
+        oldUser.setLogin(newUserForUpdate.getLogin());
+        oldUser.setBirthday(newUserForUpdate.getBirthday());
         allUsersByIds.put(newUserForUpdate.getId(), oldUser);
         log.info("old user updated");
         return oldUser;

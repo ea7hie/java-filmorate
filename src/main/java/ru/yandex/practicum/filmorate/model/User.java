@@ -14,7 +14,6 @@ import java.util.Set;
 
 @Data
 @RequiredArgsConstructor
-@AllArgsConstructor
 public class User {
 
     private Long id;
@@ -47,6 +46,14 @@ public class User {
     }
 
     public User(String email, String login, LocalDate birthday) {
+        this.email = email;
+        this.login = login;
+        this.birthday = birthday;
+    }
+
+    public User(Long id, String name, String email, String login, LocalDate birthday) {
+        this.id = id;
+        this.name = name;
         this.email = email;
         this.login = login;
         this.birthday = birthday;

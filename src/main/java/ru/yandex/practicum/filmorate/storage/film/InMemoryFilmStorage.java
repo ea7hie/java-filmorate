@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.storage.film;
 
+import jakarta.validation.ValidationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.comparators.FilmComparatorByAmountOfLikes;
@@ -29,6 +30,9 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public Collection<Film> getMostLikedFilms(int count) {
+        if (count <= 0) {
+            throw new ValidationException("Введено неверное число. Используйте целое число, большее нуля.");
+        }
         count = Math.min(count, allFilmsByIds.size());
         return allFilmsByIds.values().stream()
                 .sorted(new FilmComparatorByAmountOfLikes())

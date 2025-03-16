@@ -16,8 +16,6 @@ import java.util.Set;
  */
 @Data
 @NoArgsConstructor
-@RequiredArgsConstructor
-@AllArgsConstructor
 public class Film {
 
     private Long id;
@@ -38,4 +36,26 @@ public class Film {
     @Positive
     @NonNull
     private Integer duration;
+
+    public Film(@NonNull String name,
+                @NonNull String description,
+                @NonNull LocalDate releaseDate,
+                @NonNull Integer duration) {
+        this.name = name;
+        this.description = description;
+        this.releaseDate = releaseDate;
+        this.duration = duration;
+    }
+
+    public Film(Long id,
+                @NonNull String name,
+                @NonNull String description,
+                @NonNull LocalDate releaseDate,
+                @NonNull Integer duration) {
+        this.name = name;
+        this.description = description;
+        this.releaseDate = releaseDate;
+        this.duration = duration;
+        this.id = id;
+    }
 }

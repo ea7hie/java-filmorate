@@ -26,9 +26,9 @@ public class FilmController {
         return filmService.getFilmStorage().getFilmById(idOfFilm);
     }
 
-    @GetMapping("/popular?count={count}")
-    public Collection<Film> getPopularFilms(@RequestParam(defaultValue = "10") int count) {
-        return filmService.getFilmStorage().getMostLikedFilms(count);
+    @GetMapping("/popular")
+    public Collection<Film> getPopularFilms(@RequestParam(defaultValue = "10") int amount) {
+        return filmService.getFilmStorage().getMostLikedFilms(amount);
     }
 
     @PostMapping
