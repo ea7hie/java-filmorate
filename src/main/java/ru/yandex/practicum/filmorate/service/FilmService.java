@@ -23,7 +23,7 @@ public class FilmService {
 
         Set<Long> idsOfAllUsersWhoLike = filmStorage.getFilmById(idOfFilm).getIdsOfAllUsersWhoLike();
         idsOfAllUsersWhoLike.add(idOfUser);
-        return filmStorage.getFilmById(idOfUser);
+        return filmStorage.getFilmById(idOfFilm);
     }
 
     public Film deleteLikeFilm(long idOfFilm, long idOfUser) {
@@ -32,7 +32,7 @@ public class FilmService {
 
         Set<Long> idsOfAllUsersWhoLike = filmStorage.getFilmById(idOfFilm).getIdsOfAllUsersWhoLike();
         idsOfAllUsersWhoLike.remove(idOfUser);
-        return filmStorage.getFilmById(idOfUser);
+        return filmStorage.getFilmById(idOfFilm);
     }
 
     private void checkUserIsAdded(long idOfUserForCheck) {
