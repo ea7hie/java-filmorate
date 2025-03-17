@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -228,13 +229,17 @@ class FilmControllerTest {
 
     //I.3.C ввод некорректного имени: null
     @Test
-    void shouldThrowNullPointerExceptionIfNewFilmWithNameIsNull() {
+    void shouldNotUpdateIfNewFilmWithNameIsNull() throws Exception{
         int sizeBeforeTest = filmController.getAllFilms().size();
 
-        assertThrows(NullPointerException.class, () -> {
-            Film filmWithNameIsNull = new Film(
-                    null, "desc", LocalDate.of(2000, 12, 28), 120);
-        });
+        Film filmWithNameIsNull = new Film(
+                null, "desc", LocalDate.of(2000, 12, 28), 120);
+
+        mockMvc.perform(
+                put("/films")
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(filmWithNameIsNull))
+        ).andExpect(status().isInternalServerError());
 
         assertEquals(sizeBeforeTest, filmController.getAllFilms().size());
     }
@@ -258,13 +263,17 @@ class FilmControllerTest {
 
     //I.4.B ввод некорректного описания: null
     @Test
-    void shouldThrowNullPointerExceptionIfNewFilmWithDescriptionIsNull() {
+    void shouldNotUpdateIfNewFilmWithDescriptionIsNull() throws Exception{
         int sizeBeforeTest = filmController.getAllFilms().size();
 
-        assertThrows(NullPointerException.class, () -> {
-            Film filmWithDescriptionIsNull = new Film(
-                    "someName", null, LocalDate.of(2000, 12, 28), 120);
-        });
+        Film filmWithDescriptionIsNull = new Film(
+                "someName", null, LocalDate.of(2000, 12, 28), 120);
+
+        mockMvc.perform(
+                put("/films")
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(filmWithDescriptionIsNull))
+        ).andExpect(status().isInternalServerError());
 
         assertEquals(sizeBeforeTest, filmController.getAllFilms().size());
     }
@@ -289,13 +298,17 @@ class FilmControllerTest {
 
     //I.5.B ввод некорректной даты: null
     @Test
-    void shouldThrowNullPointerExceptionIfNewFilmWithReleaseDateIsNull() {
+    void shouldNotUpdateIfNewFilmWithReleaseDateIsNull() throws Exception{
         int sizeBeforeTest = filmController.getAllFilms().size();
 
-        assertThrows(NullPointerException.class, () -> {
-            Film filmWithReleaseDateIsNull = new Film(
-                    "someName", "someDescription", null, 120);
-        });
+        Film filmWithReleaseDateIsNull = new Film(
+                "someName", "someDescription", null, 120);
+
+        mockMvc.perform(
+                put("/films")
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(filmWithReleaseDateIsNull))
+        ).andExpect(status().isInternalServerError());
 
         assertEquals(sizeBeforeTest, filmController.getAllFilms().size());
     }
@@ -596,13 +609,17 @@ class FilmControllerTest {
 
     //III.4.C ввод некорректного имени: null
     @Test
-    void shouldThrowNullPointerExceptionIfUpdateFilmWithNameIsNull() {
+    void shouldNotUpdateIfUpdateFilmWithNameIsNull() throws Exception {
         int sizeBeforeTest = filmController.getAllFilms().size();
 
-        assertThrows(NullPointerException.class, () -> {
-            Film filmWithNameIsNull = new Film(1L, null, "desc",
-                    LocalDate.of(2000, 12, 28), 120);
-        });
+        Film filmWithNameIsNull = new Film(1L, null, "desc",
+                LocalDate.of(2000, 12, 28), 120);
+
+        mockMvc.perform(
+                put("/films")
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(filmWithNameIsNull))
+        ).andExpect(status().isInternalServerError());
 
         assertEquals(sizeBeforeTest, filmController.getAllFilms().size());
     }
@@ -626,13 +643,17 @@ class FilmControllerTest {
 
     //III.5.B ввод некорректного описания: null
     @Test
-    void shouldThrowNullPointerExceptionIfUpdateFilmWithDescriptionIsNull() {
+    void shouldNotUpdateIfUpdateFilmWithDescriptionIsNull() throws Exception{
         int sizeBeforeTest = filmController.getAllFilms().size();
 
-        assertThrows(NullPointerException.class, () -> {
-            Film filmWithDescriptionIsNull = new Film(1L, "someName", null,
-                    LocalDate.of(2000, 12, 28), 120);
-        });
+        Film filmWithDescriptionIsNull = new Film(1L, "someName", null,
+                LocalDate.of(2000, 12, 28), 120);
+
+        mockMvc.perform(
+                put("/films")
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(filmWithDescriptionIsNull))
+        ).andExpect(status().isInternalServerError());
 
         assertEquals(sizeBeforeTest, filmController.getAllFilms().size());
     }
@@ -656,13 +677,17 @@ class FilmControllerTest {
 
     //III.6.B ввод некорректной даты: null
     @Test
-    void shouldThrowNullPointerExceptionIfUpdateFilmWithReleaseDateIsNull() {
+    void shouldNotUpdateIfUpdateFilmWithReleaseDateIsNull() throws Exception{
         int sizeBeforeTest = filmController.getAllFilms().size();
 
-        assertThrows(NullPointerException.class, () -> {
-            Film filmWithReleaseDateIsNull = new Film(1L, "someName", "someDescription",
-                    null, 120);
-        });
+        Film filmWithReleaseDateIsNull = new Film(1L, "someName", "someDescription",
+                null, 120);
+
+        mockMvc.perform(
+                put("/films")
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(filmWithReleaseDateIsNull))
+        ).andExpect(status().isInternalServerError());
 
         assertEquals(sizeBeforeTest, filmController.getAllFilms().size());
     }
