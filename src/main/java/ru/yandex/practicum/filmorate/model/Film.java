@@ -3,7 +3,9 @@ package ru.yandex.practicum.filmorate.model;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
-import lombok.*;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
 import ru.yandex.practicum.filmorate.annotations.CheckDate;
 
 import java.time.LocalDate;
@@ -37,10 +39,10 @@ public class Film {
     @NonNull
     private Integer duration;
 
-    public Film(@NonNull String name,
-                @NonNull String description,
-                @NonNull LocalDate releaseDate,
-                @NonNull Integer duration) {
+    public Film(String name,
+                String description,
+                LocalDate releaseDate,
+                Integer duration) {
         this.name = name;
         this.description = description;
         this.releaseDate = releaseDate;
@@ -48,10 +50,10 @@ public class Film {
     }
 
     public Film(Long id,
-                @NonNull String name,
-                @NonNull String description,
-                @NonNull LocalDate releaseDate,
-                @NonNull Integer duration) {
+                String name,
+                String description,
+                LocalDate releaseDate,
+                Integer duration) {
         this.name = name;
         this.description = description;
         this.releaseDate = releaseDate;

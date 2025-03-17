@@ -1,19 +1,18 @@
 package ru.yandex.practicum.filmorate.service;
 
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
 public class UserService {
-    @Getter
     private final UserStorage userStorage;
 
     public List<User> getAllFriends(long idOfUser) {
@@ -61,6 +60,22 @@ public class UserService {
                 .filter(idsOfAllFriendsOfUser2::contains)
                 .map(userStorage::getUserById)
                 .toList();
+    }
+
+    public Collection<User> getAllUsers() {
+        return userStorage.getAllUsers();
+    }
+
+    public User getUserById(long idOfUser) {
+        return userStorage.getUserById(idOfUser);
+    }
+
+    public User addNewUser(User newUser) {
+        return userStorage.addUser(newUser);
+    }
+
+    public User updateUser(User newUser) {
+        return userStorage.updateUser(newUser);
     }
 
     private void checkUserIsAdded(long idOfUserForCheck) {
