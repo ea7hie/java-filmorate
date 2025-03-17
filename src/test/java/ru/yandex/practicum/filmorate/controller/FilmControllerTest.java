@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -229,7 +228,7 @@ class FilmControllerTest {
 
     //I.3.C ввод некорректного имени: null
     @Test
-    void shouldNotUpdateIfNewFilmWithNameIsNull() throws Exception{
+    void shouldNotUpdateIfNewFilmWithNameIsNull() throws Exception {
         int sizeBeforeTest = filmController.getAllFilms().size();
 
         Film filmWithNameIsNull = new Film(
@@ -263,7 +262,7 @@ class FilmControllerTest {
 
     //I.4.B ввод некорректного описания: null
     @Test
-    void shouldNotUpdateIfNewFilmWithDescriptionIsNull() throws Exception{
+    void shouldNotUpdateIfNewFilmWithDescriptionIsNull() throws Exception {
         int sizeBeforeTest = filmController.getAllFilms().size();
 
         Film filmWithDescriptionIsNull = new Film(
@@ -298,7 +297,7 @@ class FilmControllerTest {
 
     //I.5.B ввод некорректной даты: null
     @Test
-    void shouldNotUpdateIfNewFilmWithReleaseDateIsNull() throws Exception{
+    void shouldNotUpdateIfNewFilmWithReleaseDateIsNull() throws Exception {
         int sizeBeforeTest = filmController.getAllFilms().size();
 
         Film filmWithReleaseDateIsNull = new Film(
@@ -643,7 +642,7 @@ class FilmControllerTest {
 
     //III.5.B ввод некорректного описания: null
     @Test
-    void shouldNotUpdateIfUpdateFilmWithDescriptionIsNull() throws Exception{
+    void shouldNotUpdateIfUpdateFilmWithDescriptionIsNull() throws Exception {
         int sizeBeforeTest = filmController.getAllFilms().size();
 
         Film filmWithDescriptionIsNull = new Film(1L, "someName", null,
@@ -677,7 +676,7 @@ class FilmControllerTest {
 
     //III.6.B ввод некорректной даты: null
     @Test
-    void shouldNotUpdateIfUpdateFilmWithReleaseDateIsNull() throws Exception{
+    void shouldNotUpdateIfUpdateFilmWithReleaseDateIsNull() throws Exception {
         int sizeBeforeTest = filmController.getAllFilms().size();
 
         Film filmWithReleaseDateIsNull = new Film(1L, "someName", "someDescription",
