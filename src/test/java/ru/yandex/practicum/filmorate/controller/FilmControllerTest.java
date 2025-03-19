@@ -6,14 +6,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.web.servlet.MockMvc;
-import ru.yandex.practicum.filmorate.exceptions.ValidationException;
+import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.User;
 
 import java.time.LocalDate;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /*
@@ -40,6 +42,8 @@ I - POST
         I.6.A - 0 min
         I.6.B - negative
 II - GET
+    II.1 - get all films
+    II.2 - get film by id
 III - PUT
     III.1 - correct fields
     III.2 - boundary conditions
@@ -65,6 +69,9 @@ III - PUT
     III.7 - incorrect duration
         III.7.A - 0 min
         III.7.B - negative
+    III.8 - add like
+IV - DELETE
+    IV.1 - delete like
 */
 
 @SpringBootTest
@@ -221,13 +228,17 @@ class FilmControllerTest {
 
     //I.3.C ввод некорректного имени: null
     @Test
-    void shouldThrowNullPointerExceptionIfNewFilmWithNameIsNull() {
+    void shouldNotUpdateIfNewFilmWithNameIsNull() throws Exception {
         int sizeBeforeTest = filmController.getAllFilms().size();
 
-        assertThrows(NullPointerException.class, () -> {
-            Film filmWithNameIsNull = new Film(
-                    null, "desc", LocalDate.of(2000, 12, 28), 120);
-        });
+        Film filmWithNameIsNull = new Film(
+                null, "desc", LocalDate.of(2000, 12, 28), 120);
+
+        mockMvc.perform(
+                put("/films")
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(filmWithNameIsNull))
+        ).andExpect(status().isInternalServerError());
 
         assertEquals(sizeBeforeTest, filmController.getAllFilms().size());
     }
@@ -251,13 +262,17 @@ class FilmControllerTest {
 
     //I.4.B ввод некорректного описания: null
     @Test
-    void shouldThrowNullPointerExceptionIfNewFilmWithDescriptionIsNull() {
+    void shouldNotUpdateIfNewFilmWithDescriptionIsNull() throws Exception {
         int sizeBeforeTest = filmController.getAllFilms().size();
 
-        assertThrows(NullPointerException.class, () -> {
-            Film filmWithDescriptionIsNull = new Film(
-                    "someName", null, LocalDate.of(2000, 12, 28), 120);
-        });
+        Film filmWithDescriptionIsNull = new Film(
+                "someName", null, LocalDate.of(2000, 12, 28), 120);
+
+        mockMvc.perform(
+                put("/films")
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(filmWithDescriptionIsNull))
+        ).andExpect(status().isInternalServerError());
 
         assertEquals(sizeBeforeTest, filmController.getAllFilms().size());
     }
@@ -282,13 +297,17 @@ class FilmControllerTest {
 
     //I.5.B ввод некорректной даты: null
     @Test
-    void shouldThrowNullPointerExceptionIfNewFilmWithReleaseDateIsNull() {
+    void shouldNotUpdateIfNewFilmWithReleaseDateIsNull() throws Exception {
         int sizeBeforeTest = filmController.getAllFilms().size();
 
-        assertThrows(NullPointerException.class, () -> {
-            Film filmWithReleaseDateIsNull = new Film(
-                    "someName", "someDescription", null, 120);
-        });
+        Film filmWithReleaseDateIsNull = new Film(
+                "someName", "someDescription", null, 120);
+
+        mockMvc.perform(
+                put("/films")
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(filmWithReleaseDateIsNull))
+        ).andExpect(status().isInternalServerError());
 
         assertEquals(sizeBeforeTest, filmController.getAllFilms().size());
     }
@@ -331,6 +350,7 @@ class FilmControllerTest {
 
 
     //II. Проверка метода GET
+    //II.1 вывод всех фильмов
     @Test
     void shouldGetListOfAddedFilm() throws Exception {
         int sizeBeforeTest = filmController.getAllFilms().size();
@@ -339,6 +359,32 @@ class FilmControllerTest {
                 get("/films")
                         .contentType("application/json")
         ).andExpect(status().isOk());
+
+        assertEquals(sizeBeforeTest, filmController.getAllFilms().size());
+    }
+
+    //II.2 вывод фильма по id
+    @Test
+    void shouldGetilm() throws Exception {
+        int sizeBeforeTest = filmController.getAllFilms().size();
+
+        mockMvc.perform(
+                        get("/films/1")
+                                .contentType("application/json")
+                ).andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(filmController.getFilmById(1))));
+
+        mockMvc.perform(
+                        get("/films/100000")
+                                .contentType("application/json")
+                ).andExpect(status().isNotFound())
+                .andExpect(result -> assertTrue(result.getResolvedException() instanceof NotFoundException));
+
+        mockMvc.perform(
+                        get("/films/-10")
+                                .contentType("application/json")
+                ).andExpect(status().isNotFound())
+                .andExpect(result -> assertTrue(result.getResolvedException() instanceof NotFoundException));
 
         assertEquals(sizeBeforeTest, filmController.getAllFilms().size());
     }
@@ -478,7 +524,7 @@ class FilmControllerTest {
                 143
         );
 
-        assertThrows(ValidationException.class, () -> filmController.updateFilm(newFilmForUpdate));
+        assertThrows(NotFoundException.class, () -> filmController.updateFilm(newFilmForUpdate));
 
         assertEquals(sizeBeforeTest, filmController.getAllFilms().size());
     }
@@ -496,7 +542,7 @@ class FilmControllerTest {
                 143
         );
 
-        assertThrows(ValidationException.class, () -> filmController.updateFilm(newFilmForUpdate));
+        assertThrows(NotFoundException.class, () -> filmController.updateFilm(newFilmForUpdate));
 
         assertEquals(sizeBeforeTest, filmController.getAllFilms().size());
     }
@@ -515,7 +561,7 @@ class FilmControllerTest {
                 143
         );
 
-        assertThrows(ValidationException.class, () -> filmController.updateFilm(newFilmForUpdate));
+        assertThrows(NotFoundException.class, () -> filmController.updateFilm(newFilmForUpdate));
 
         assertEquals(sizeBeforeTest, filmController.getAllFilms().size());
     }
@@ -562,13 +608,17 @@ class FilmControllerTest {
 
     //III.4.C ввод некорректного имени: null
     @Test
-    void shouldThrowNullPointerExceptionIfUpdateFilmWithNameIsNull() {
+    void shouldNotUpdateIfUpdateFilmWithNameIsNull() throws Exception {
         int sizeBeforeTest = filmController.getAllFilms().size();
 
-        assertThrows(NullPointerException.class, () -> {
-            Film filmWithNameIsNull = new Film(1L, null, "desc",
-                    LocalDate.of(2000, 12, 28), 120);
-        });
+        Film filmWithNameIsNull = new Film(1L, null, "desc",
+                LocalDate.of(2000, 12, 28), 120);
+
+        mockMvc.perform(
+                put("/films")
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(filmWithNameIsNull))
+        ).andExpect(status().isInternalServerError());
 
         assertEquals(sizeBeforeTest, filmController.getAllFilms().size());
     }
@@ -592,13 +642,17 @@ class FilmControllerTest {
 
     //III.5.B ввод некорректного описания: null
     @Test
-    void shouldThrowNullPointerExceptionIfUpdateFilmWithDescriptionIsNull() {
+    void shouldNotUpdateIfUpdateFilmWithDescriptionIsNull() throws Exception {
         int sizeBeforeTest = filmController.getAllFilms().size();
 
-        assertThrows(NullPointerException.class, () -> {
-            Film filmWithDescriptionIsNull = new Film(1L, "someName", null,
-                    LocalDate.of(2000, 12, 28), 120);
-        });
+        Film filmWithDescriptionIsNull = new Film(1L, "someName", null,
+                LocalDate.of(2000, 12, 28), 120);
+
+        mockMvc.perform(
+                put("/films")
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(filmWithDescriptionIsNull))
+        ).andExpect(status().isInternalServerError());
 
         assertEquals(sizeBeforeTest, filmController.getAllFilms().size());
     }
@@ -622,13 +676,17 @@ class FilmControllerTest {
 
     //III.6.B ввод некорректной даты: null
     @Test
-    void shouldThrowNullPointerExceptionIfUpdateFilmWithReleaseDateIsNull() {
+    void shouldNotUpdateIfUpdateFilmWithReleaseDateIsNull() throws Exception {
         int sizeBeforeTest = filmController.getAllFilms().size();
 
-        assertThrows(NullPointerException.class, () -> {
-            Film filmWithReleaseDateIsNull = new Film(1L, "someName", "someDescription",
-                    null, 120);
-        });
+        Film filmWithReleaseDateIsNull = new Film(1L, "someName", "someDescription",
+                null, 120);
+
+        mockMvc.perform(
+                put("/films")
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(filmWithReleaseDateIsNull))
+        ).andExpect(status().isInternalServerError());
 
         assertEquals(sizeBeforeTest, filmController.getAllFilms().size());
     }
@@ -664,6 +722,86 @@ class FilmControllerTest {
                         .content(objectMapper.writeValueAsString(filmWithIncorrectDuration))
         ).andExpect(status().isBadRequest());
 
+        assertEquals(sizeBeforeTest, filmController.getAllFilms().size());
+    }
+
+    //III.8 добавление лайка
+    @Test
+    void shouldAddLike() throws Exception {
+        int sizeBeforeTest = filmController.getAllFilms().size();
+
+        User newUser = new User("Диана", "ea7hie@mail.ru", "ea7hie",
+                LocalDate.of(2005, 1, 7));
+
+        mockMvc.perform(
+                post("/users")
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(newUser))
+        ).andExpect(status().isOk());
+
+        mockMvc.perform(
+                put("/films/1/like/1")
+                        .contentType("application/json")
+        ).andExpect(status().isOk());
+
+        mockMvc.perform(
+                        put("/films/11/like/1")
+                                .contentType("application/json")
+                ).andExpect(status().isNotFound())
+                .andExpect(result -> assertTrue(result.getResolvedException() instanceof NotFoundException));
+
+
+        mockMvc.perform(
+                        put("/films/1/like/11")
+                                .contentType("application/json")
+                ).andExpect(status().isNotFound())
+                .andExpect(result -> assertTrue(result.getResolvedException() instanceof NotFoundException));
+
+
+        mockMvc.perform(
+                        put("/films/11/like/11")
+                                .contentType("application/json")
+                ).andExpect(status().isNotFound())
+                .andExpect(result -> assertTrue(result.getResolvedException() instanceof NotFoundException));
+
+        assertTrue(filmController.getFilmById(1L).getIdsOfAllUsersWhoLike().size() == 1);
+        assertTrue(filmController.getFilmById(1L).getIdsOfAllUsersWhoLike().contains(1L));
+        assertEquals(sizeBeforeTest, filmController.getAllFilms().size());
+    }
+
+
+    //IV - Проверка метода DELETE
+    //IV.1 удаление лайка
+    @Test
+    void shouldDeleteLike() throws Exception {
+        int sizeBeforeTest = filmController.getAllFilms().size();
+
+        mockMvc.perform(
+                delete("/films/1/like/1")
+                        .contentType("application/json")
+        ).andExpect(status().isOk());
+
+        mockMvc.perform(
+                        delete("/films/11/like/1")
+                                .contentType("application/json")
+                ).andExpect(status().isNotFound())
+                .andExpect(result -> assertTrue(result.getResolvedException() instanceof NotFoundException));
+
+
+        mockMvc.perform(
+                        delete("/films/1/like/11")
+                                .contentType("application/json")
+                ).andExpect(status().isNotFound())
+                .andExpect(result -> assertTrue(result.getResolvedException() instanceof NotFoundException));
+
+
+        mockMvc.perform(
+                        delete("/films/11/like/11")
+                                .contentType("application/json")
+                ).andExpect(status().isNotFound())
+                .andExpect(result -> assertTrue(result.getResolvedException() instanceof NotFoundException));
+
+        assertTrue(filmController.getFilmById(1L).getIdsOfAllUsersWhoLike().isEmpty());
         assertEquals(sizeBeforeTest, filmController.getAllFilms().size());
     }
 }

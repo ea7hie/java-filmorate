@@ -1,89 +1,62 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import jakarta.validation.Valid;
-import jakarta.validation.ValidationException;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.UserService;
 
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
 @RestController
 @RequestMapping("/users")
+@RequiredArgsConstructor
 @Slf4j
 public class UserController {
-    private Map<Long, User> allUsersByIds = new HashMap<>();
-    private long idForNewUser = 0;
+    private final UserService userService;
 
     @GetMapping
     public Collection<User> getAllUsers() {
-        return allUsersByIds.values();
+        return userService.getAllUsers();
+    }
+
+    @GetMapping("/{idOfUser}")
+    public User getUserById(@PathVariable long idOfUser) {
+        return userService.getUserById(idOfUser);
     }
 
     @PostMapping
     public User addNewUser(@Valid @RequestBody User newUser) {
-        newUser.setId(getNextIdForUser());
-        if (isNameEmpty(newUser.getName())) {
-            log.info("new user without name; name is login");
-            newUser.setName(newUser.getLogin());
-        }
-        if (hasLoginSpaces(newUser.getLogin())) {
-            log.error("login has spaces");
-            throw new ValidationException("Логин не может содержать пробелы");
-        }
-        allUsersByIds.put(newUser.getId(), newUser);
-        return newUser;
+        return userService.addNewUser(newUser);
     }
 
     @PutMapping
     public User updateUser(@Valid @RequestBody User newUser) {
-        if (!allUsersByIds.containsKey(newUser.getId())) {
-            log.info("not founded user with id {}", newUser.getId());
-            throw new ValidationException("Не найдено пользователя с таким id: " + newUser.getId());
-        }
-
-        if (hasLoginSpaces(newUser.getLogin())) {
-            log.error("new login has spaces");
-            throw new ValidationException("Логин не может содержать пробелы");
-        }
-
-        User oldUser = allUsersByIds.get(newUser.getId());
-        if (!oldUser.getEmail().equals(newUser.getEmail())) {
-            if (isEmailAlreadyUsed(newUser.getEmail())) {
-                log.info("new email already used");
-                throw new ValidationException("Этот имейл уже используется");
-            }
-            oldUser.setEmail(newUser.getEmail());
-        }
-
-        if (isNameEmpty(newUser.getName())) {
-            log.info("new user without name; new name is login");
-            newUser.setName(newUser.getLogin());
-        }
-
-        allUsersByIds.put(newUser.getId(), newUser);
-        log.info("old user updated");
-        return newUser;
+        return userService.updateUser(newUser);
     }
 
-    private long getNextIdForUser() {
-        return ++idForNewUser;
+    @GetMapping("/{id}/friends")
+    public List<User> allFriends(@PathVariable long id) {
+        return userService.getAllFriends(id);
     }
 
-    private boolean isEmailAlreadyUsed(String emailForCheck) {
-        return allUsersByIds.values().stream()
-                .map(User::getEmail)
-                .toList()
-                .contains(emailForCheck);
+    @GetMapping("/{id}/friends/common/{otherId}")
+    public List<User> allCommonFriends(@PathVariable long id,
+                                       @PathVariable long otherId) {
+        return userService.getCommonFriends(id, otherId);
     }
 
-    private boolean isNameEmpty(String nameForCheck) {
-        return nameForCheck == null || nameForCheck.isBlank() || nameForCheck.isEmpty();
+    @PutMapping("/{id}/friends/{friendId}")
+    public List<User> makeFriends(@PathVariable long id,
+                                  @PathVariable long friendId) {
+        return userService.makeFriends(id, friendId);
     }
 
-    private boolean hasLoginSpaces(String loginForCheck) {
-        return loginForCheck.contains(" ");
+    @DeleteMapping("/{id}/friends/{friendId}")
+    public List<User> deleteFriends(@PathVariable long id,
+                                    @PathVariable long friendId) {
+        return userService.deleteFriends(id, friendId);
     }
 }

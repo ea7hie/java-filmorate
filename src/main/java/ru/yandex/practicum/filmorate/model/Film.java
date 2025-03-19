@@ -3,10 +3,14 @@ package ru.yandex.practicum.filmorate.model;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
-import lombok.*;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
 import ru.yandex.practicum.filmorate.annotations.CheckDate;
 
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 
 /**
@@ -14,11 +18,10 @@ import java.time.LocalDate;
  */
 @Data
 @NoArgsConstructor
-@RequiredArgsConstructor
-@AllArgsConstructor
 public class Film {
 
     private Long id;
+    private Set<Long> idsOfAllUsersWhoLike = new HashSet<>();
 
     @NonNull
     @NotBlank
@@ -35,4 +38,26 @@ public class Film {
     @Positive
     @NonNull
     private Integer duration;
+
+    public Film(String name,
+                String description,
+                LocalDate releaseDate,
+                Integer duration) {
+        this.name = name;
+        this.description = description;
+        this.releaseDate = releaseDate;
+        this.duration = duration;
+    }
+
+    public Film(Long id,
+                String name,
+                String description,
+                LocalDate releaseDate,
+                Integer duration) {
+        this.name = name;
+        this.description = description;
+        this.releaseDate = releaseDate;
+        this.duration = duration;
+        this.id = id;
+    }
 }

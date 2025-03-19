@@ -6,14 +6,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.web.servlet.MockMvc;
+import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.time.LocalDate;
 import java.time.Month;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /*
@@ -40,10 +42,17 @@ I - POST
         I.5.B - tomorrow
         I.5.C - null
 II - GET
+    II.1 - get all users
+    II.2 - get user by id
+    II.3 - get all friends user by id
+    II.4 - get common friends
 III - PUT
     III.1 - correct fields
         III.1.A - with name
         III.1.B - without name
+    III.2 - make friends
+IV - DELETE
+    IV.1 - delete friend
 */
 
 @SpringBootTest
@@ -90,7 +99,7 @@ class UserControllerTest {
     void shouldAddNewUserWithEmptyName() throws Exception {
         int sizeBeforeTest = userController.getAllUsers().size();
 
-        User newUser = new User("", "ea7hie@gmail.com", "login",
+        User newUser = new User("", "ea7hie11@gmail.com", "login",
                 LocalDate.of(2005, Month.JANUARY, 7));
 
         mockMvc.perform(
@@ -107,7 +116,7 @@ class UserControllerTest {
     void shouldAddNewUserWithNameIsSpaces() throws Exception {
         int sizeBeforeTest = userController.getAllUsers().size();
 
-        User newUser = new User("     ", "ea7hie@gmail.com", "login",
+        User newUser = new User("     ", "ea7hie98@gmail.com", "login",
                 LocalDate.of(2005, Month.JANUARY, 7));
 
         mockMvc.perform(
@@ -125,7 +134,7 @@ class UserControllerTest {
         int sizeBeforeTest = userController.getAllUsers().size();
         String isNull = null;
 
-        User newUser = new User(isNull, "ea7hie@gmail.com", "login",
+        User newUser = new User(isNull, "ea7hie14@gmail.com", "login",
                 LocalDate.of(2005, Month.JANUARY, 7));
 
         mockMvc.perform(
@@ -142,7 +151,7 @@ class UserControllerTest {
     void shouldAddNewUserWithoutName() throws Exception {
         int sizeBeforeTest = userController.getAllUsers().size();
 
-        User newUser = new User("ea7hie@gmail.com", "login",
+        User newUser = new User("ea7hi123e@gmail.com", "login",
                 LocalDate.of(2005, Month.JANUARY, 7));
 
         mockMvc.perform(
@@ -159,7 +168,7 @@ class UserControllerTest {
     void shouldAddNewUserWithBirthdayIsYesterday() throws Exception {
         int sizeBeforeTest = userController.getAllUsers().size();
 
-        User newUser = new User("ea7hie@gmail.com", "login",
+        User newUser = new User("ea7hie56@gmail.com", "login",
                 LocalDate.now().minusDays(1));
 
         mockMvc.perform(
@@ -262,9 +271,6 @@ class UserControllerTest {
         int sizeBeforeTest = userController.getAllUsers().size();
         User newUser = new User("name", null, "login",
                 LocalDate.of(2005, Month.JANUARY, 7));
-       /* assertThrows(NullPointerException.class, () -> {
-
-        });*/
 
         mockMvc.perform(
                 post("/users")
@@ -345,6 +351,7 @@ class UserControllerTest {
 
 
     //II. Проверка метода GET
+    //II.1 - вывод всех пользователей
     @Test
     void shouldGet() throws Exception {
         int sizeBeforeTest = userController.getAllUsers().size();
@@ -353,6 +360,70 @@ class UserControllerTest {
                 get("/users")
                         .contentType("application/json")
         ).andExpect(status().isOk());
+
+        assertEquals(sizeBeforeTest, userController.getAllUsers().size());
+    }
+
+    //II.2 - вывод пользователя по id
+    @Test
+    void shouldGetById() throws Exception {
+        int sizeBeforeTest = userController.getAllUsers().size();
+
+        mockMvc.perform(
+                        get("/users/1")
+                                .contentType("application/json")
+                ).andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(userController.getUserById(1))));
+
+        mockMvc.perform(
+                        get("/users/100000")
+                                .contentType("application/json")
+                ).andExpect(status().isNotFound())
+                .andExpect(result -> assertTrue(result.getResolvedException() instanceof NotFoundException));
+
+        mockMvc.perform(
+                        get("/users/-10")
+                                .contentType("application/json")
+                ).andExpect(status().isNotFound())
+                .andExpect(result -> assertTrue(result.getResolvedException() instanceof NotFoundException));
+
+        assertEquals(sizeBeforeTest, userController.getAllUsers().size());
+    }
+
+    //II.3 - вывод друзей пользователя по id
+    @Test
+    void shouldGetAllFriends() throws Exception {
+        int sizeBeforeTest = userController.getAllUsers().size();
+
+        mockMvc.perform(
+                get("/users/1/friends")
+                        .contentType("application/json")
+        ).andExpect(status().isOk());
+
+        mockMvc.perform(
+                        get("/users/1000000/friends")
+                                .contentType("application/json")
+                ).andExpect(status().isNotFound())
+                .andExpect(result -> assertTrue(result.getResolvedException() instanceof NotFoundException));
+
+        assertEquals(sizeBeforeTest, userController.getAllUsers().size());
+    }
+
+    //II.4 - вывод общих друзей пользователей
+    @Test
+    void shouldGetCommonFriends() throws Exception {
+        int sizeBeforeTest = userController.getAllUsers().size();
+
+        mockMvc.perform(
+                get("/users/1/friends/common/2")
+                        .contentType("application/json")
+        ).andExpect(status().isOk());
+
+        mockMvc.perform(
+                        get("/users/1/friends/common/200000")
+                                .contentType("application/json")
+                ).andExpect(status().isNotFound())
+                .andExpect(result -> assertTrue(result.getResolvedException() instanceof NotFoundException));
 
         assertEquals(sizeBeforeTest, userController.getAllUsers().size());
     }
@@ -381,7 +452,7 @@ class UserControllerTest {
     void shouldUpdateUserWithoutName() throws Exception {
         int sizeBeforeTest = userController.getAllUsers().size();
 
-        User newUser = new User(1L, "ea7hie56@gmail.com", "login",
+        User newUser = new User(1L, "ea7hie561@gmail.com", "login",
                 LocalDate.of(2005, Month.JANUARY, 7));
 
         mockMvc.perform(
@@ -390,6 +461,42 @@ class UserControllerTest {
                         .content(objectMapper.writeValueAsString(newUser))
         ).andExpect(status().isOk());
 
+        assertEquals(sizeBeforeTest, userController.getAllUsers().size());
+    }
+
+    //III.2 добавление в друзья
+    @Test
+    void shouldMakeFriends() throws Exception {
+        int sizeBeforeTest = userController.getAllUsers().size();
+
+        mockMvc.perform(
+                put("/users/1/friends/2")
+                        .contentType("application/json")
+        ).andExpect(status().isOk());
+
+        assertTrue(userController.getUserById(1).getIdsOfAllFriends().contains(2L));
+        assertTrue(userController.getUserById(2).getIdsOfAllFriends().contains(1L));
+        assertTrue(userController.allFriends(1).contains(userController.getUserById(2)));
+        assertTrue(userController.allFriends(2).contains(userController.getUserById(1)));
+        assertEquals(sizeBeforeTest, userController.getAllUsers().size());
+    }
+
+
+    //IV. Проверка метода DELETE
+    //IV.1 удаление из друзей
+    @Test
+    void shouldDeleteFriends() throws Exception {
+        int sizeBeforeTest = userController.getAllUsers().size();
+
+        mockMvc.perform(
+                delete("/users/1/friends/2")
+                        .contentType("application/json")
+        ).andExpect(status().isOk());
+
+        assertFalse(userController.getUserById(1).getIdsOfAllFriends().contains(2L));
+        assertFalse(userController.getUserById(2).getIdsOfAllFriends().contains(1L));
+        assertFalse(userController.allFriends(1).contains(userController.getUserById(2)));
+        assertFalse(userController.allFriends(2).contains(userController.getUserById(1)));
         assertEquals(sizeBeforeTest, userController.getAllUsers().size());
     }
 }
