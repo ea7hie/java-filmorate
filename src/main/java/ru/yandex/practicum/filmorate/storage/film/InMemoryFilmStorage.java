@@ -7,7 +7,9 @@ import ru.yandex.practicum.filmorate.comparators.FilmComparatorByAmountOfLikes;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 @Slf4j
 @Component
@@ -51,6 +53,8 @@ public class InMemoryFilmStorage implements FilmStorage {
     @Override
     public Film updateFilm(Film newFilmForUpdate) {
         if (allFilmsByIds.containsKey(newFilmForUpdate.getId())) {
+            newFilmForUpdate.setIdsOfAllUsersWhoLike(
+                    allFilmsByIds.get(newFilmForUpdate.getId()).getIdsOfAllUsersWhoLike());
             allFilmsByIds.put(newFilmForUpdate.getId(), newFilmForUpdate);
             log.info("old film updated");
             return newFilmForUpdate;
