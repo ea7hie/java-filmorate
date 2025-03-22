@@ -474,10 +474,8 @@ class UserControllerTest {
                         .contentType("application/json")
         ).andExpect(status().isOk());
 
-        assertTrue(userController.getUserById(1).getIdsOfAllFriends().contains(2L));
-        assertTrue(userController.getUserById(2).getIdsOfAllFriends().contains(1L));
+        assertTrue(userController.getUserById(1).getIdsOfAllFriends().containsKey(2L));
         assertTrue(userController.allFriends(1).contains(userController.getUserById(2)));
-        assertTrue(userController.allFriends(2).contains(userController.getUserById(1)));
         assertEquals(sizeBeforeTest, userController.getAllUsers().size());
     }
 
@@ -493,8 +491,8 @@ class UserControllerTest {
                         .contentType("application/json")
         ).andExpect(status().isOk());
 
-        assertFalse(userController.getUserById(1).getIdsOfAllFriends().contains(2L));
-        assertFalse(userController.getUserById(2).getIdsOfAllFriends().contains(1L));
+        assertFalse(userController.getUserById(1).getIdsOfAllFriends().containsKey(2L));
+        assertFalse(userController.getUserById(2).getIdsOfAllFriends().containsKey(1L));
         assertFalse(userController.allFriends(1).contains(userController.getUserById(2)));
         assertFalse(userController.allFriends(2).contains(userController.getUserById(1)));
         assertEquals(sizeBeforeTest, userController.getAllUsers().size());

@@ -34,7 +34,8 @@ public class UserService {
         Map<Long, Boolean> allFriendsOfUser1 = userStorage.getUserById(idOfUser1).getIdsOfAllFriends();
         Map<Long, Boolean> allFriendsOfUser2 = userStorage.getUserById(idOfUser2).getIdsOfAllFriends();
 
-        if (allFriendsOfUser1.get(idOfUser2) && allFriendsOfUser2.get(idOfUser1)) {
+        if (allFriendsOfUser1.getOrDefault(idOfUser2, false)
+                && allFriendsOfUser2.getOrDefault(idOfUser1, false)) {
             log.info("{} and {} are already friends.", idOfUser1, idOfUser2);
         } else if (!allFriendsOfUser1.containsKey(idOfUser2)) {
             log.info("{} sent a request to friends to {}.", idOfUser1, idOfUser2);
@@ -58,7 +59,8 @@ public class UserService {
         Map<Long, Boolean> allFriendsOfUser1 = userStorage.getUserById(idOfUser1).getIdsOfAllFriends();
         Map<Long, Boolean> allFriendsOfUser2 = userStorage.getUserById(idOfUser2).getIdsOfAllFriends();
 
-        if (allFriendsOfUser1.get(idOfUser2) && allFriendsOfUser2.get(idOfUser1)) {
+        if (allFriendsOfUser1.getOrDefault(idOfUser2, false)
+                && allFriendsOfUser2.getOrDefault(idOfUser1, false)) {
             log.info("{} removed {} from friends.", idOfUser1, idOfUser2);
             allFriendsOfUser1.remove(idOfUser2);
             allFriendsOfUser2.put(idOfUser1, false);
