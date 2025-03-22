@@ -12,7 +12,6 @@ import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
-
 /**
  * Film.
  */
@@ -38,6 +37,9 @@ public class Film {
     @Positive
     @NonNull
     private Integer duration;
+
+    Genres[] genres;
+    MpaRatings mpaRating;
 
     public Film(String name,
                 String description,
