@@ -8,8 +8,8 @@ import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.HashMap;
+import java.util.Map;
 
 @Data
 @RequiredArgsConstructor
@@ -17,7 +17,7 @@ public class User {
 
     private Long id;
     private String name;
-    private Set<Long> idsOfAllFriends = new HashSet<>();
+    private Map<Long, Boolean> idsOfAllFriends = new HashMap<>();
 
     @NotBlank
     @Email
