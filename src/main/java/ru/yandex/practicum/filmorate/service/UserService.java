@@ -18,6 +18,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class UserService {
     private final UserStorage userStorage;
+    // private final FilmStorage filmStorage;
 
     public List<User> getAllFriends(long idOfUser) {
         checkUserIsAdded(idOfUser);
@@ -37,13 +38,13 @@ public class UserService {
         if (allFriendsOfUser1.getOrDefault(idOfUser2, false)
                 && allFriendsOfUser2.getOrDefault(idOfUser1, false)) {
             log.info("{} and {} are already friends.", idOfUser1, idOfUser2);
-        } else if (!allFriendsOfUser1.containsKey(idOfUser2)) {
-            log.info("{} sent a request to friends to {}.", idOfUser1, idOfUser2);
-            allFriendsOfUser1.put(idOfUser2, false);
         } else if (!allFriendsOfUser1.containsKey(idOfUser2) && allFriendsOfUser2.containsKey(idOfUser1)) {
             log.info("{} responds to an incoming friend request from {}.", idOfUser1, idOfUser2);
             allFriendsOfUser1.put(idOfUser2, true);
             allFriendsOfUser2.put(idOfUser1, true);
+        } else if (!allFriendsOfUser1.containsKey(idOfUser2)) {
+            log.info("{} sent a request to friends to {}.", idOfUser1, idOfUser2);
+            allFriendsOfUser1.put(idOfUser2, false);
         } else {
             log.error("Ошибка при попытке добавления в друзья");
             throw new ValidationException("Произошла неизвестная ошибка");
@@ -120,9 +121,32 @@ public class UserService {
         return userStorage.updateUser(newUser);
     }
 
+   /* public User deleteUser(long idForDelete) {
+        checkUserIsAdded(idForDelete);
+
+        deleteFromFriendsDeletedUser(idForDelete);
+        deleteAllLikesDeletedUser(idForDelete);
+
+        return userStorage.deleteUser(idForDelete);
+    }*/
+
     private void checkUserIsAdded(long idOfUserForCheck) {
         if (userStorage.getUserById(idOfUserForCheck) == null) {
             throw new NotFoundException(String.format("Пользователя для с id=%d не найдено", idOfUserForCheck));
         }
     }
+
+   /* private void deleteFromFriendsDeletedUser(long idDeletedUser) {
+        userStorage.getAllUsers().stream()
+                .filter(user -> user.getIdsOfAllFriends().containsKey(idDeletedUser))
+                .map(user -> user.getIdsOfAllFriends().remove(idDeletedUser))
+                .close();
+    }
+
+    private void deleteAllLikesDeletedUser(long idForDelete) {
+        filmStorage.getAllFilms().stream()
+                .filter(film -> film.getIdsOfAllUsersWhoLike().contains(idForDelete))
+                .peek(film -> film.getIdsOfAllUsersWhoLike().remove(idForDelete))
+                .close();
+    }*/
 }

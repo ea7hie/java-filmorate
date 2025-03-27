@@ -21,6 +21,8 @@ public class Film {
 
     private Long id;
     private Set<Long> idsOfAllUsersWhoLike = new HashSet<>();
+    private Genres[] genres;
+    private MpaRatings mpaRating;
 
     @NonNull
     @NotBlank
@@ -37,9 +39,6 @@ public class Film {
     @Positive
     @NonNull
     private Integer duration;
-
-    Genres[] genres;
-    MpaRatings mpaRating;
 
     public Film(String name,
                 String description,

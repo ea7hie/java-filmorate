@@ -54,6 +54,10 @@ public class FilmService {
         return filmStorage.updateFilm(newFilm);
     }
 
+    public Film deleteFilmById(long idForDelete) {
+        return filmStorage.deleteFilm(idForDelete);
+    }
+
     private void checkUserIsAdded(long idOfUserForCheck) {
         if (userStorage.getUserById(idOfUserForCheck) == null) {
             throw new NotFoundException(String.format("Пользователя для с id=%d не найдено", idOfUserForCheck));
