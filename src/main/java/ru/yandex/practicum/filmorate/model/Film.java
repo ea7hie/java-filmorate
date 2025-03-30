@@ -25,18 +25,18 @@ public class Film {
     private MpaRatings mpaRating;
 
     @NonNull
-    @NotBlank
+    @NotBlank(message = "Название фильма не может быть пустым")
     private String name;
 
     @NonNull
-    @Size(max = 200)
+    @Size(max = 200, message = "Длина описания фильма не может быть больше 200 символов")
     private String description;
 
     @NonNull
-    @CheckDate
+    @CheckDate(message = "Фильм не мог быть снят до 28 декабря 1895г")
     private LocalDate releaseDate;
 
-    @Positive
+    @Positive(message = "Продолжительность фильма не может быть отрицательной")
     @NonNull
     private Integer duration;
 

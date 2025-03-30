@@ -19,15 +19,15 @@ public class User {
     private String name;
     private Map<Long, Boolean> idsOfAllFriends = new HashMap<>();
 
-    @NotBlank
-    @Email
+    @NotBlank(message = "email пользователя не может быть пустым")
+    @Email(message = "Введённый вами email не соответствует стандартам")
     private String email;
 
-    @NotBlank
+    @NotBlank(message = "Логин пользователя не может быть пустым")
     private String login;
 
     @NotNull
-    @Past
+    @Past(message = "День рождения пользователя не может быть в будущем")
     private LocalDate birthday;
 
     public User(String name, String email, String login, LocalDate birthday) {

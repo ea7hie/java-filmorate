@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.storage.user;
 
+import jakarta.validation.Valid;
 import jakarta.validation.ValidationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -30,7 +31,7 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public User addUser(User newUserForAdd) {
+    public User addUser(@Valid User newUserForAdd) {
         if (isEmailAlreadyUsed(newUserForAdd.getEmail())) {
             log.error("new email already used");
             throw new ValidationException("Этот имейл уже используется");
@@ -49,7 +50,7 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public User updateUser(User newUserForUpdate) {
+    public User updateUser(@Valid User newUserForUpdate) {
         if (!allUsersByIds.containsKey(newUserForUpdate.getId())) {
             log.info("not founded user with id {}", newUserForUpdate.getId());
             throw new NotFoundException("Не найдено пользователя для обновления с id:" + newUserForUpdate.getId());
