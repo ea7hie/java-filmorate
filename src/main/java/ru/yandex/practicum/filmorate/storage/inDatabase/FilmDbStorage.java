@@ -59,7 +59,7 @@ public class FilmDbStorage implements FilmStorage {
             String setGenres = "INSERT INTO film_genre (film_id, genre_id) VALUES (?, ?)";
             Set<Genres> uniqueGenres = new HashSet<>(newFilmForAdd.getGenres());
             for (Genres uniqueGenre : uniqueGenres) {
-                allGenres.addLast(uniqueGenre);
+                allGenres.add(uniqueGenre);
                 jdbcTemplate.update(setGenres, newFilmForAdd.getId(), uniqueGenre.getId());
             }
         } catch (Exception e) {
@@ -90,7 +90,7 @@ public class FilmDbStorage implements FilmStorage {
             String setGenres = "INSERT INTO film_genre (film_id, genre_id) VALUES (?, ?)";
             Set<Genres> uniqueGenres = new HashSet<>(newFilmForUpdate.getGenres());
             for (Genres uniqueGenre : uniqueGenres) {
-                allGenres.addLast(uniqueGenre);
+                allGenres.add(uniqueGenre);
                 jdbcTemplate.update(setGenres, newFilmForUpdate.getId(), uniqueGenre.getId());
             }
         }
