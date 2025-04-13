@@ -37,7 +37,9 @@ public class FilmRowMapper implements RowMapper<Film> {
         String genreSql =
                 "SELECT g.genre_id, g.genre_name FROM film_genre fg " +
                         "JOIN genres g ON fg.genre_id = g.genre_id " +
-                        "WHERE fg.film_id = ?";
+                        "WHERE fg.film_id = ?" +
+                        "ORDER BY genre_id";
+
         List<Genres> genres = jdbcTemplate.query(
                 genreSql, (rs2, row2) ->
                         new Genres(rs2.getInt("genre_id"), rs2.getString("genre_name")), filmId);

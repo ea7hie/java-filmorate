@@ -151,7 +151,6 @@ public class FilmDbStorage implements FilmStorage {
 
     private void genresToDb(Film film) {
         if (film.getGenres() != null && !film.getGenres().isEmpty()) {
-            // Удаляем дубликаты жанров
             Set<Genres> uniqueGenres = new HashSet<>(film.getGenres());
 
             String genreInsertSql = "INSERT INTO film_genre (film_id, genre_id) VALUES (?, ?)";
