@@ -42,10 +42,10 @@ public class UserController {
         return userService.getAllFriends(id);
     }
 
-   /* @DeleteMapping("/{id}")
+    @DeleteMapping("/{id}")
     public User deleteUsers(@PathVariable long id) {
         return userService.deleteUser(id);
-    }*/
+    }
 
     @PutMapping("/{id}/friends/{friendId}")
     public List<User> makeFriends(@PathVariable long id,
