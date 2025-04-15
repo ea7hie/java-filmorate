@@ -26,7 +26,6 @@ public class MpaController {
 
     @GetMapping("/{idMpaRating}")
     public MpaRatings getGenreById(@PathVariable int idMpaRating) {
-        return mpaService.getMpaRatingById(idMpaRating).orElseThrow(() ->
-                new NotFoundException("Не найдено возрастного рейтинга для отображения с id=" + idMpaRating));
+        return mpaService.getMpaRatingById(idMpaRating);
     }
 }

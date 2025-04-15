@@ -11,7 +11,6 @@ import ru.yandex.practicum.filmorate.model.MpaRatings;
 import ru.yandex.practicum.filmorate.storage.interfaces.MpaStorage;
 
 import java.util.Collection;
-import java.util.Optional;
 
 @Slf4j
 @Repository
@@ -28,15 +27,15 @@ public class MpaDbStorage implements MpaStorage {
     }
 
     @Override
-    public Optional<MpaRatings> getMpaRatingByIndex(int id) {
+    public MpaRatings getMpaRatingByIndex(int id) {
         String sql = "SELECT mpa_rating_id, description FROM mpa_ratings WHERE mpa_rating_id = ?";
-        Optional<MpaRatings> mpaRatingsOptional = Optional.empty();
+        MpaRatings mpaRatings;
         try {
-            mpaRatingsOptional = Optional.ofNullable(jdbcTemplate.queryForObject(sql, (rs, rowNum) ->
-                    new MpaRatings(rs.getInt("mpa_rating_id"), rs.getString("description")), id));
+            mpaRatings = jdbcTemplate.queryForObject(sql, (rs, rowNum) ->
+                    new MpaRatings(rs.getInt("mpa_rating_id"), rs.getString("description")), id);
         } catch (EmptyResultDataAccessException e) {
             throw new NotFoundException(String.format("MPA рейтинг с id = %d не найден", id));
         }
-        return mpaRatingsOptional;
+        return mpaRatings;
     }
 }

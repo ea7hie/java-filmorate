@@ -10,7 +10,7 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
-import ru.yandex.practicum.filmorate.mappers.UserRowMapper;
+import ru.yandex.practicum.filmorate.mappers.users.UserRowMapper;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.interfaces.UserStorage;
 
@@ -42,9 +42,9 @@ public class UserDbStorage implements UserStorage {
             if (user != null) {
                 user.setIdsOfAllFriends(getMapOfAllFriends(id));
             }
-            return jdbcTemplate.queryForObject(sql, new UserRowMapper(jdbcTemplate), id);
+            return user;
         } catch (EmptyResultDataAccessException e) {
-            throw new NotFoundException(String.format("Пользователя для отображения с id=%d не найдено", id));
+            throw new NotFoundException(String.format("123Пользователя для отображения с id=%d не найдено", id));
         }
     }
 
@@ -114,8 +114,8 @@ public class UserDbStorage implements UserStorage {
         User user1 = getUserById(idOfUser1);
         User user2 = getUserById(idOfUser2);
 
-        Map<Long, Boolean> allFriendsOfUser1 = getMapOfAllFriends(idOfUser1);
-        Map<Long, Boolean> allFriendsOfUser2 = getMapOfAllFriends(idOfUser2);
+        Map<Long, Boolean> allFriendsOfUser1 = user1.getIdsOfAllFriends();
+        Map<Long, Boolean> allFriendsOfUser2 = user2.getIdsOfAllFriends();
 
         if (allFriendsOfUser1.getOrDefault(idOfUser2, false)
                 && allFriendsOfUser2.getOrDefault(idOfUser1, false)) {
@@ -218,17 +218,12 @@ public class UserDbStorage implements UserStorage {
     }
 
     private Map<Long, Boolean> getMapOfAllFriends(long idOfUser) {
-        String sql = "SELECT user_friend_id FROM friends WHERE user_id=?";
-        String getStatus = "SELECT status FROM friends WHERE user_id=? AND user_friend_id=?";
-
-        List<Long> ids = jdbcTemplate.queryForList(sql, Long.class, idOfUser);
+        String friendsSqlQuery = "SELECT user_friend_id, status FROM friends WHERE user_id=?";
+        List<Map<String, Object>> rows = jdbcTemplate.queryForList(friendsSqlQuery, idOfUser);
         Map<Long, Boolean> friends = new HashMap<>();
-
-        for (Long id : ids) {
-            Boolean isFriends = jdbcTemplate.queryForObject(getStatus, Boolean.class, idOfUser, id);
-            friends.put(id, isFriends);
+        for (Map<String, Object> row : rows) {
+            friends.put((Long) row.get("user_friend_id"), (Boolean) row.get("status"));
         }
-        jdbcTemplate.queryForList(sql, Long.class, idOfUser);
 
         return friends;
     }

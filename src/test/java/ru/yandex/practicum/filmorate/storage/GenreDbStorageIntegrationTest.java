@@ -29,7 +29,7 @@ class GenreDbStorageIntegrationTest {
 
     @Test
     public void testGetGenreById() {
-        Genres genre = genreStorage.getGenreByIndex(1).get();
+        Genres genre = genreStorage.getGenreByIndex(1);
         assertThat(genre).isNotNull();
         assertThat(genre.getId()).isEqualTo(1);
     }

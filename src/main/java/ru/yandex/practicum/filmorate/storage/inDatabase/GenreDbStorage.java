@@ -11,7 +11,6 @@ import ru.yandex.practicum.filmorate.model.Genres;
 import ru.yandex.practicum.filmorate.storage.interfaces.GenreStorage;
 
 import java.util.Collection;
-import java.util.Optional;
 
 @Slf4j
 @Repository
@@ -28,15 +27,15 @@ public class GenreDbStorage implements GenreStorage {
     }
 
     @Override
-    public Optional<Genres> getGenreByIndex(int id) {
+    public Genres getGenreByIndex(int id) {
         String sql = "SELECT genre_id, genre_name FROM genres WHERE genre_id = ?";
-        Optional<Genres> genresOptional = Optional.empty();
+        Genres genres;
         try {
-            genresOptional = Optional.ofNullable(jdbcTemplate.queryForObject(sql, (rs, rowNum) ->
-                    new Genres(rs.getInt("genre_id"), rs.getString("genre_name")), id));
+            genres = jdbcTemplate.queryForObject(sql, (rs, rowNum) ->
+                    new Genres(rs.getInt("genre_id"), rs.getString("genre_name")), id);
         } catch (EmptyResultDataAccessException e) {
             throw new NotFoundException(String.format("Жанр с id = %d не найден", id));
         }
-        return genresOptional;
+        return genres;
     }
 }

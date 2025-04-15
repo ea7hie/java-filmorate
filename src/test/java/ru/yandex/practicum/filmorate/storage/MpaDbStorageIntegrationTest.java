@@ -28,7 +28,7 @@ class MpaDbStorageIntegrationTest {
 
     @Test
     public void testGetMpaById() {
-        MpaRatings mpa = mpaStorage.getMpaRatingByIndex(1).get();
+        MpaRatings mpa = mpaStorage.getMpaRatingByIndex(1);
         assertThat(mpa).isNotNull();
         assertThat(mpa.getId()).isEqualTo(1);
     }

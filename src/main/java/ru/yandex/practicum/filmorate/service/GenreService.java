@@ -3,11 +3,11 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Genres;
 import ru.yandex.practicum.filmorate.storage.interfaces.GenreStorage;
 
 import java.util.Collection;
-import java.util.Optional;
 
 @Slf4j
 @Service
@@ -22,7 +22,11 @@ public class GenreService {
         return genreStorage.getAllGenres();
     }
 
-    public Optional<Genres> getGenreById(int idOfGenre) {
-        return genreStorage.getGenreByIndex(idOfGenre);
+    public Genres getGenreById(int idOfGenre) {
+        Genres genreByIndex = genreStorage.getGenreByIndex(idOfGenre);
+        if (genreByIndex == null) {
+            throw new NotFoundException(String.format("Жанр с id = %d не найден", idOfGenre));
+        }
+        return genreByIndex;
     }
 }
