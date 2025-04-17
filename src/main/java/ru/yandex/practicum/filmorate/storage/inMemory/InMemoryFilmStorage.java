@@ -1,26 +1,30 @@
-package ru.yandex.practicum.filmorate.storage.film;
+package ru.yandex.practicum.filmorate.storage.inMemory;
 
 import jakarta.validation.Valid;
 import jakarta.validation.ValidationException;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.comparators.FilmComparatorByAmountOfLikes;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.storage.interfaces.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.interfaces.UserStorage;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class InMemoryFilmStorage implements FilmStorage {
     private Map<Long, Film> allFilmsByIds = new HashMap<>();
     private long idForNewFilm = 0;
+    private final FilmStorage filmStorage;
+    private final UserStorage userStorage;
 
     @Override
     public Collection<Film> getAllFilms() {
-        return allFilmsByIds.values();
+        return allFilmsByIds.values().stream().toList();
     }
 
     @Override
@@ -32,7 +36,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public Collection<Film> getMostLikedFilms(int count) {
+    public List<Film> getMostLikedFilms(int count) {
         if (count <= 0) {
             throw new ValidationException("Введено неверное число. Используйте целое число, большее нуля.");
         }
@@ -72,7 +76,39 @@ public class InMemoryFilmStorage implements FilmStorage {
         throw new NotFoundException("Не найдено фильма для удаления с id:" + idFilmForDelete);
     }
 
+    @Override
+    public Film addLikeFilm(long idOfFilm, long idOfUser) {
+        checkUserIsAdded(idOfUser);
+        checkFilmIsAdded(idOfFilm);
+
+        Set<Long> idsOfAllUsersWhoLike = filmStorage.getFilmById(idOfFilm).getIdsOfAllUsersWhoLike();
+        idsOfAllUsersWhoLike.add(idOfUser);
+        return filmStorage.getFilmById(idOfFilm);
+    }
+
+    @Override
+    public Film deleteLikeFilm(long idOfFilm, long idOfUser) {
+        checkUserIsAdded(idOfUser);
+        checkFilmIsAdded(idOfFilm);
+
+        Set<Long> idsOfAllUsersWhoLike = filmStorage.getFilmById(idOfFilm).getIdsOfAllUsersWhoLike();
+        idsOfAllUsersWhoLike.remove(idOfUser);
+        return filmStorage.getFilmById(idOfFilm);
+    }
+
     private long getNextIdForFilm() {
         return ++idForNewFilm;
+    }
+
+    private void checkUserIsAdded(long idOfUserForCheck) {
+        if (userStorage.getUserById(idOfUserForCheck) == null) {
+            throw new NotFoundException(String.format("Пользователя для с id=%d не найдено", idOfUserForCheck));
+        }
+    }
+
+    private void checkFilmIsAdded(long idOfFilmForCheck) {
+        if (filmStorage.getFilmById(idOfFilmForCheck) == null) {
+            throw new NotFoundException(String.format("Фильма для с id=%d не найдено", idOfFilmForCheck));
+        }
     }
 }

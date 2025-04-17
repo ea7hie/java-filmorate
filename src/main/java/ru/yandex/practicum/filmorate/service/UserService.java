@@ -1,108 +1,37 @@
 package ru.yandex.practicum.filmorate.service;
 
-import jakarta.validation.ValidationException;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.user.UserStorage;
+import ru.yandex.practicum.filmorate.storage.interfaces.UserStorage;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class UserService {
     private final UserStorage userStorage;
-    // private final FilmStorage filmStorage;
+
+    public UserService(@Qualifier("userDbStorage") UserStorage userStorage) {
+        this.userStorage = userStorage;
+    }
 
     public List<User> getAllFriends(long idOfUser) {
-        checkUserIsAdded(idOfUser);
-
-        return userStorage.getUserById(idOfUser).getIdsOfAllFriends().keySet().stream()
-                .map(userStorage::getUserById)
-                .toList();
+        return userStorage.getAllFriends(idOfUser);
     }
 
     public List<User> makeFriends(long idOfUser1, long idOfUser2) {
-        checkUserIsAdded(idOfUser1);
-        checkUserIsAdded(idOfUser2);
-
-        Map<Long, Boolean> allFriendsOfUser1 = userStorage.getUserById(idOfUser1).getIdsOfAllFriends();
-        Map<Long, Boolean> allFriendsOfUser2 = userStorage.getUserById(idOfUser2).getIdsOfAllFriends();
-
-        if (allFriendsOfUser1.getOrDefault(idOfUser2, false)
-                && allFriendsOfUser2.getOrDefault(idOfUser1, false)) {
-            log.info("{} and {} are already friends.", idOfUser1, idOfUser2);
-        } else if (!allFriendsOfUser1.containsKey(idOfUser2) && allFriendsOfUser2.containsKey(idOfUser1)) {
-            log.info("{} responds to an incoming friend request from {}.", idOfUser1, idOfUser2);
-            allFriendsOfUser1.put(idOfUser2, true);
-            allFriendsOfUser2.put(idOfUser1, true);
-        } else if (!allFriendsOfUser1.containsKey(idOfUser2)) {
-            log.info("{} sent a request to friends to {}.", idOfUser1, idOfUser2);
-            allFriendsOfUser1.put(idOfUser2, false);
-        } else {
-            log.error("Ошибка при попытке добавления в друзья");
-            throw new ValidationException("Произошла неизвестная ошибка");
-        }
-
-        return List.of(userStorage.getUserById(idOfUser1), userStorage.getUserById(idOfUser2));
+        return userStorage.makeFriends(idOfUser1, idOfUser2);
     }
 
     public List<User> deleteFriends(long idOfUser1, long idOfUser2) {
-        checkUserIsAdded(idOfUser1);
-        checkUserIsAdded(idOfUser2);
-
-        Map<Long, Boolean> allFriendsOfUser1 = userStorage.getUserById(idOfUser1).getIdsOfAllFriends();
-        Map<Long, Boolean> allFriendsOfUser2 = userStorage.getUserById(idOfUser2).getIdsOfAllFriends();
-
-        if (allFriendsOfUser1.getOrDefault(idOfUser2, false)
-                && allFriendsOfUser2.getOrDefault(idOfUser1, false)) {
-            log.info("{} removed {} from friends.", idOfUser1, idOfUser2);
-            allFriendsOfUser1.remove(idOfUser2);
-            allFriendsOfUser2.put(idOfUser1, false);
-        } else if (!allFriendsOfUser1.containsKey(idOfUser2)) {
-            log.info("{} didn't send a request to friends to {}.", idOfUser1, idOfUser2);
-            throw new NotFoundException("Заявка в друзья этому пользователю не отправлялась.");
-        } else if (allFriendsOfUser1.containsKey(idOfUser2)) {
-            log.info("{} removed request to friends to {}.", idOfUser1, idOfUser2);
-            allFriendsOfUser1.remove(idOfUser2);
-        } else {
-            log.error("Ошибка при попытке удаления из друзей");
-            throw new ValidationException("Произошла неизвестная ошибка");
-        }
-
-        return List.of(userStorage.getUserById(idOfUser1), userStorage.getUserById(idOfUser2));
+        return userStorage.deleteFriends(idOfUser1, idOfUser2);
     }
 
     public List<User> getCommonFriends(long idOfUser1, long idOfUser2) {
-        checkUserIsAdded(idOfUser1);
-        checkUserIsAdded(idOfUser2);
-
-        Map<Long, Boolean> allRequestsOfUser1 = userStorage.getUserById(idOfUser1).getIdsOfAllFriends();
-        List<Long> idsOfAllFriendsOfUser1 = new ArrayList<>();
-        for (Long id : allRequestsOfUser1.keySet()) {
-            if (allRequestsOfUser1.get(id)) {
-                idsOfAllFriendsOfUser1.add(id);
-            }
-        }
-
-        Map<Long, Boolean> allRequestsOfUser2 = userStorage.getUserById(idOfUser1).getIdsOfAllFriends();
-        List<Long> idsOfAllFriendsOfUser2 = new ArrayList<>();
-        for (Long id : allRequestsOfUser2.keySet()) {
-            if (allRequestsOfUser2.get(id)) {
-                idsOfAllFriendsOfUser2.add(id);
-            }
-        }
-
-        return idsOfAllFriendsOfUser1.stream()
-                .filter(idsOfAllFriendsOfUser2::contains)
-                .map(userStorage::getUserById)
-                .toList();
+        return userStorage.getCommonFriends(idOfUser1, idOfUser2);
     }
 
     public Collection<User> getAllUsers() {
@@ -121,32 +50,7 @@ public class UserService {
         return userStorage.updateUser(newUser);
     }
 
-   /* public User deleteUser(long idForDelete) {
-        checkUserIsAdded(idForDelete);
-
-        deleteFromFriendsDeletedUser(idForDelete);
-        deleteAllLikesDeletedUser(idForDelete);
-
+    public User deleteUser(long idForDelete) {
         return userStorage.deleteUser(idForDelete);
-    }*/
-
-    private void checkUserIsAdded(long idOfUserForCheck) {
-        if (userStorage.getUserById(idOfUserForCheck) == null) {
-            throw new NotFoundException(String.format("Пользователя для с id=%d не найдено", idOfUserForCheck));
-        }
     }
-
-   /* private void deleteFromFriendsDeletedUser(long idDeletedUser) {
-        userStorage.getAllUsers().stream()
-                .filter(user -> user.getIdsOfAllFriends().containsKey(idDeletedUser))
-                .map(user -> user.getIdsOfAllFriends().remove(idDeletedUser))
-                .close();
-    }
-
-    private void deleteAllLikesDeletedUser(long idForDelete) {
-        filmStorage.getAllFilms().stream()
-                .filter(film -> film.getIdsOfAllUsersWhoLike().contains(idForDelete))
-                .peek(film -> film.getIdsOfAllUsersWhoLike().remove(idForDelete))
-                .close();
-    }*/
 }

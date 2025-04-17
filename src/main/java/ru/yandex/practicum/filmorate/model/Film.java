@@ -10,6 +10,7 @@ import ru.yandex.practicum.filmorate.annotations.CheckDate;
 
 import java.time.LocalDate;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -21,8 +22,8 @@ public class Film {
 
     private Long id;
     private Set<Long> idsOfAllUsersWhoLike = new HashSet<>();
-    private Genres[] genres;
-    private MpaRatings mpaRating;
+    private List<Genres> genres;
+    private MpaRatings mpa;
 
     @NonNull
     @NotBlank(message = "Название фильма не может быть пустым")

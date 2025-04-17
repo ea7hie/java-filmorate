@@ -1,9 +1,10 @@
-package ru.yandex.practicum.filmorate.storage.film;
+package ru.yandex.practicum.filmorate.storage.interfaces;
 
 import jakarta.validation.Valid;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import java.util.Collection;
+import java.util.List;
 
 public interface FilmStorage {
     Collection<Film> getAllFilms();
@@ -16,5 +17,9 @@ public interface FilmStorage {
 
     Film deleteFilm(long idFilmForDelete);
 
-    Collection<Film> getMostLikedFilms(int count);
+    List<Film> getMostLikedFilms(int count);
+
+    Film addLikeFilm(long idOfFilm, long idOfUser);
+
+    Film deleteLikeFilm(long idOfFilm, long idOfUser);
 }
